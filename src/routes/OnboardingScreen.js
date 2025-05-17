@@ -616,7 +616,9 @@
 
 // export default OnboardingScreen;
 
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useRef } from 'react';
+import { TailSpin } from 'react-loader-spinner';
+import toast from 'react-hot-toast';
 import { motion } from 'motion/react';
 import rb from '../assets/rb.png';
 import RouteLoader from '../components/shared/RouteLoader';
@@ -624,13 +626,15 @@ import { days, months } from '../utils/date';
 import { useAuth } from '../context/AuthContext';
 import { useNavigate } from 'react-router-dom';
 import { hasCompletedOnboarding, onboardUser } from '../utils/user';
-import { TailSpin } from 'react-loader-spinner';
-import toast from 'react-hot-toast';
+import { countries } from '../utils/countryList';
 
 const initialValues = {
 	fullname: '',
 	email: '',
-	whatsapp_no: '',
+	whatsapp_no: {
+		countryCode: '+234', // Default to Nigeria
+		number: '',
+	},
 	dob: { day: '', month: '' },
 	age: '',
 	education: '',
@@ -674,8 +678,20 @@ function OnboardingScreen() {
 		if (step === 1) {
 			if (!formValues.fullname.trim())
 				newErrors.fullname = 'Full name is required';
-			if (!formValues.whatsapp_no.trim())
+
+			// WhatsApp validation
+			if (!formValues.whatsapp_no.number.trim()) {
 				newErrors.whatsapp_no = 'WhatsApp number is required';
+			} else {
+				// Remove any non-digit characters for validation
+				const cleanNumber = formValues.whatsapp_no.number.replace(/\D/g, '');
+
+				// Basic number validation (most WhatsApp numbers are between 7 and 15 digits)
+				if (cleanNumber.length < 7 || cleanNumber.length > 15) {
+					newErrors.whatsapp_no = 'Please enter a valid WhatsApp number';
+				}
+			}
+
 			if (!formValues.dob.day || !formValues.dob.month)
 				newErrors.dob = 'Date of birth is required';
 			if (!formValues.age) newErrors.age = 'Age is required';
@@ -721,6 +737,7 @@ function OnboardingScreen() {
 
 	const handleChange = (e) => {
 		const { name, value } = e.target;
+
 		if (name.includes('dob.')) {
 			const dobField = name.split('.')[1];
 			setFormValues((prevValues) => ({
@@ -728,6 +745,22 @@ function OnboardingScreen() {
 				dob: {
 					...prevValues.dob,
 					[dobField]: value,
+				},
+			}));
+		} else if (name === 'countryCode') {
+			setFormValues((prevValues) => ({
+				...prevValues,
+				whatsapp_no: {
+					...prevValues.whatsapp_no,
+					countryCode: value,
+				},
+			}));
+		} else if (name === 'whatsappNumber') {
+			setFormValues((prevValues) => ({
+				...prevValues,
+				whatsapp_no: {
+					...prevValues.whatsapp_no,
+					number: value,
 				},
 			}));
 		} else {
@@ -769,73 +802,6 @@ function OnboardingScreen() {
 
 	// Progress calculation
 	const progressPercentage = ((step - 1) / 2) * 100;
-
-	// Form field component for reusability
-	const FormField = ({
-		label,
-		name,
-		type = 'text',
-		required = true,
-		placeholder,
-		value,
-		onChange,
-		error,
-		options,
-		readOnly = false,
-	}) => (
-		<div className='mb-4'>
-			<label className='block text-sm font-medium text-gray-700 mb-1'>
-				{label} {required && <span className='text-red-500'>*</span>}
-			</label>
-
-			{type === 'select' ? (
-				<select
-					name={name}
-					value={value}
-					onChange={onChange}
-					readOnly={readOnly}
-					className={`w-full px-4 py-2 rounded-lg border ${
-						error ? 'border-red-500' : 'border-gray-300'
-					} focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all`}
-				>
-					<option value=''>Select an option</option>
-					{options?.map((option) => (
-						<option
-							key={option}
-							value={typeof option === 'object' ? option.month : option}
-						>
-							{typeof option === 'object' ? option.label : option}
-						</option>
-					))}
-				</select>
-			) : type === 'textarea' ? (
-				<textarea
-					name={name}
-					value={value}
-					onChange={onChange}
-					placeholder={placeholder}
-					readOnly={readOnly}
-					className={`w-full px-4 py-2 rounded-lg border ${
-						error ? 'border-red-500' : 'border-gray-300'
-					} focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all min-h-[100px]`}
-				/>
-			) : (
-				<input
-					type={type}
-					name={name}
-					value={value}
-					onChange={onChange}
-					placeholder={placeholder}
-					readOnly={readOnly}
-					className={`w-full px-4 py-2 rounded-lg border ${
-						error ? 'border-red-500' : 'border-gray-300'
-					} focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all`}
-				/>
-			)}
-
-			{error && <p className='mt-1 text-sm text-red-500'>{error}</p>}
-		</div>
-	);
 
 	return (
 		<div className='flex min-h-screen bg-gray-50'>
@@ -965,31 +931,84 @@ function OnboardingScreen() {
 									</p>
 								</div>
 
-								<FormField
-									label='Full Name'
-									name='fullname'
-									placeholder='Enter your full name'
-									value={formValues.fullname}
-									onChange={handleChange}
-									error={formError.fullname}
-								/>
+								<div className='mb-4'>
+									<label className='block text-sm font-medium text-gray-700 mb-1'>
+										Full Name <span className='text-red-500'>*</span>
+									</label>
+									<input
+										type='text'
+										name='fullname'
+										placeholder='Enter your full name'
+										value={formValues.fullname}
+										onChange={handleChange}
+										className={`w-full px-4 py-2 rounded-lg border ${
+											formError.fullname ? 'border-red-500' : 'border-gray-300'
+										} focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all`}
+									/>
+									{formError.fullname && (
+										<p className='mt-1 text-sm text-red-500'>
+											{formError.fullname}
+										</p>
+									)}
+								</div>
 
-								<FormField
-									label='Email'
-									name='email'
-									type='email'
-									value={user.email}
-									readOnly={true}
-								/>
+								<div className='mb-4'>
+									<label className='block text-sm font-medium text-gray-700 mb-1'>
+										Email <span className='text-red-500'>*</span>
+									</label>
+									<input
+										type='email'
+										name='email'
+										value={user?.email || ''}
+										readOnly={true}
+										className='w-full px-4 py-2 rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all'
+									/>
+								</div>
 
-								<FormField
-									label='WhatsApp Number'
-									name='whatsapp_no'
-									placeholder='Enter your WhatsApp number'
-									value={formValues.whatsapp_no}
-									onChange={handleChange}
-									error={formError.whatsapp_no}
-								/>
+								<div className='mb-4'>
+									<label className='block text-sm font-medium text-gray-700 mb-1'>
+										WhatsApp Number <span className='text-red-500'>*</span>
+									</label>
+									<div className='flex'>
+										<div className='w-1/3 mr-2'>
+											<select
+												name='countryCode'
+												value={formValues.whatsapp_no.countryCode}
+												onChange={handleChange}
+												className='w-full px-4 py-2 rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all'
+											>
+												{countries.map((country) => (
+													<option key={country.code} value={country.code}>
+														{country.name} {country.code}
+													</option>
+												))}
+											</select>
+										</div>
+										<div className='w-2/3'>
+											<input
+												type='tel'
+												name='whatsappNumber'
+												placeholder='Enter your WhatsApp number'
+												value={formValues.whatsapp_no.number}
+												onChange={handleChange}
+												className={`w-full px-4 py-2 rounded-lg border ${
+													formError.whatsapp_no
+														? 'border-red-500'
+														: 'border-gray-300'
+												} focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all`}
+											/>
+										</div>
+									</div>
+									{formError.whatsapp_no && (
+										<p className='mt-1 text-sm text-red-500'>
+											{formError.whatsapp_no}
+										</p>
+									)}
+									<p className='mt-1 text-xs text-gray-500'>
+										Please select your country code and enter your WhatsApp
+										number without leading zeros
+									</p>
+								</div>
 
 								<div className='mb-4'>
 									<label className='block text-sm font-medium text-gray-700 mb-1'>
@@ -1032,30 +1051,61 @@ function OnboardingScreen() {
 									)}
 								</div>
 
-								<FormField
-									label='Age Range'
-									name='age'
-									type='select'
-									value={formValues.age}
-									onChange={handleChange}
-									error={formError.age}
-									options={['Below 20', '21-29', '30-39', '40-49', 'Above 50']}
-								/>
+								<div className='mb-4'>
+									<label className='block text-sm font-medium text-gray-700 mb-1'>
+										Age Range <span className='text-red-500'>*</span>
+									</label>
+									<select
+										name='age'
+										value={formValues.age}
+										onChange={handleChange}
+										className={`w-full px-4 py-2 rounded-lg border ${
+											formError.age ? 'border-red-500' : 'border-gray-300'
+										} focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all`}
+									>
+										<option value=''>Select an option</option>
+										<option value='Below 20'>Below 20</option>
+										<option value='21-29'>21-29</option>
+										<option value='30-39'>30-39</option>
+										<option value='40-49'>40-49</option>
+										<option value='Above 50'>Above 50</option>
+									</select>
+									{formError.age && (
+										<p className='mt-1 text-sm text-red-500'>{formError.age}</p>
+									)}
+								</div>
 
-								<FormField
-									label='Highest Education Level'
-									name='education'
-									type='select'
-									value={formValues.education}
-									onChange={handleChange}
-									error={formError.education}
-									options={[
-										'Secondary School Certificate',
-										'Currently an undergraduate',
-										"Bachelor's Degree",
-										'Masters / Post Graduate Degree',
-									]}
-								/>
+								<div className='mb-4'>
+									<label className='block text-sm font-medium text-gray-700 mb-1'>
+										Highest Education Level{' '}
+										<span className='text-red-500'>*</span>
+									</label>
+									<select
+										name='education'
+										value={formValues.education}
+										onChange={handleChange}
+										className={`w-full px-4 py-2 rounded-lg border ${
+											formError.education ? 'border-red-500' : 'border-gray-300'
+										} focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all`}
+									>
+										<option value=''>Select an option</option>
+										<option value='Secondary School Certificate'>
+											Secondary School Certificate
+										</option>
+										<option value='Currently an undergraduate'>
+											Currently an undergraduate
+										</option>
+										<option value="Bachelor's Degree">Bachelor's Degree</option>
+										<option value='Masters / Post Graduate Degree'>
+											Masters / Post Graduate Degree
+										</option>
+									</select>
+									{formError.education && (
+										<p className='mt-1 text-sm text-red-500'>
+											{formError.education}
+										</p>
+									)}
+								</div>
 							</motion.div>
 						)}
 
@@ -1079,55 +1129,138 @@ function OnboardingScreen() {
 									</p>
 								</div>
 
-								<FormField
-									label='Do you have any previous knowledge of the course?'
-									name='previousKnowledge'
-									type='select'
-									value={formValues.previousKnowledge}
-									onChange={handleChange}
-									error={formError.previousKnowledge}
-									options={['Yes', 'No']}
-								/>
+								<div className='mb-4'>
+									<label className='block text-sm font-medium text-gray-700 mb-1'>
+										Do you have any previous knowledge of the course?{' '}
+										<span className='text-red-500'>*</span>
+									</label>
+									<select
+										name='previousKnowledge'
+										value={formValues.previousKnowledge}
+										onChange={handleChange}
+										className={`w-full px-4 py-2 rounded-lg border ${
+											formError.previousKnowledge
+												? 'border-red-500'
+												: 'border-gray-300'
+										} focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all`}
+									>
+										<option value=''>Select an option</option>
+										<option value='Yes'>Yes</option>
+										<option value='No'>No</option>
+									</select>
+									{formError.previousKnowledge && (
+										<p className='mt-1 text-sm text-red-500'>
+											{formError.previousKnowledge}
+										</p>
+									)}
+								</div>
 
-								<FormField
-									label='How would you rate your overall tech proficiency?'
-									name='techProficiency'
-									type='select'
-									value={formValues.techProficiency}
-									onChange={handleChange}
-									error={formError.techProficiency}
-									options={['Beginner', 'Intermediate', 'Expert']}
-								/>
+								<div className='mb-4'>
+									<label className='block text-sm font-medium text-gray-700 mb-1'>
+										How would you rate your overall tech proficiency?{' '}
+										<span className='text-red-500'>*</span>
+									</label>
+									<select
+										name='techProficiency'
+										value={formValues.techProficiency}
+										onChange={handleChange}
+										className={`w-full px-4 py-2 rounded-lg border ${
+											formError.techProficiency
+												? 'border-red-500'
+												: 'border-gray-300'
+										} focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all`}
+									>
+										<option value=''>Select an option</option>
+										<option value='Beginner'>Beginner</option>
+										<option value='Intermediate'>Intermediate</option>
+										<option value='Expert'>Expert</option>
+									</select>
+									{formError.techProficiency && (
+										<p className='mt-1 text-sm text-red-500'>
+											{formError.techProficiency}
+										</p>
+									)}
+								</div>
 
-								<FormField
-									label='Are you ready to commit to the full bootcamp duration (6 weeks)?'
-									name='bootcampCommitment'
-									type='select'
-									value={formValues.bootcampCommitment}
-									onChange={handleChange}
-									error={formError.bootcampCommitment}
-									options={['Yes', 'No']}
-								/>
+								<div className='mb-4'>
+									<label className='block text-sm font-medium text-gray-700 mb-1'>
+										Are you ready to commit to the full bootcamp duration (6
+										weeks)? <span className='text-red-500'>*</span>
+									</label>
+									<select
+										name='bootcampCommitment'
+										value={formValues.bootcampCommitment}
+										onChange={handleChange}
+										className={`w-full px-4 py-2 rounded-lg border ${
+											formError.bootcampCommitment
+												? 'border-red-500'
+												: 'border-gray-300'
+										} focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all`}
+									>
+										<option value=''>Select an option</option>
+										<option value='Yes'>Yes</option>
+										<option value='No'>No</option>
+									</select>
+									{formError.bootcampCommitment && (
+										<p className='mt-1 text-sm text-red-500'>
+											{formError.bootcampCommitment}
+										</p>
+									)}
+								</div>
 
-								<FormField
-									label='How comfortable are you with using video conferencing platforms?'
-									name='videoConferencingComfort'
-									type='select'
-									value={formValues.videoConferencingComfort}
-									onChange={handleChange}
-									error={formError.videoConferencingComfort}
-									options={['Not comfortable', 'Very comfortable']}
-								/>
+								<div className='mb-4'>
+									<label className='block text-sm font-medium text-gray-700 mb-1'>
+										How comfortable are you with using video conferencing
+										platforms? <span className='text-red-500'>*</span>
+									</label>
+									<select
+										name='videoConferencingComfort'
+										value={formValues.videoConferencingComfort}
+										onChange={handleChange}
+										className={`w-full px-4 py-2 rounded-lg border ${
+											formError.videoConferencingComfort
+												? 'border-red-500'
+												: 'border-gray-300'
+										} focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all`}
+									>
+										<option value=''>Select an option</option>
+										<option value='Not comfortable'>Not comfortable</option>
+										<option value='Very comfortable'>Very comfortable</option>
+									</select>
+									{formError.videoConferencingComfort && (
+										<p className='mt-1 text-sm text-red-500'>
+											{formError.videoConferencingComfort}
+										</p>
+									)}
+								</div>
 
-								<FormField
-									label='Your preferred time for the class?'
-									name='preferredClassTime'
-									type='select'
-									value={formValues.preferredClassTime}
-									onChange={handleChange}
-									error={formError.preferredClassTime}
-									options={['7PM WAT - 9PM WAT', '8PM WAT - 10PM WAT']}
-								/>
+								<div className='mb-4'>
+									<label className='block text-sm font-medium text-gray-700 mb-1'>
+										Your preferred time for the class?{' '}
+										<span className='text-red-500'>*</span>
+									</label>
+									<select
+										name='preferredClassTime'
+										value={formValues.preferredClassTime}
+										onChange={handleChange}
+										className={`w-full px-4 py-2 rounded-lg border ${
+											formError.preferredClassTime
+												? 'border-red-500'
+												: 'border-gray-300'
+										} focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all`}
+									>
+										<option value=''>Select an option</option>
+										<option value='7PM WAT - 9PM WAT'>7PM WAT - 9PM WAT</option>
+										<option value='8PM WAT - 10PM WAT'>
+											8PM WAT - 10PM WAT
+										</option>
+									</select>
+									{formError.preferredClassTime && (
+										<p className='mt-1 text-sm text-red-500'>
+											{formError.preferredClassTime}
+										</p>
+									)}
+								</div>
 							</motion.div>
 						)}
 
@@ -1151,39 +1284,82 @@ function OnboardingScreen() {
 									</p>
 								</div>
 
-								<FormField
-									label='What is your purpose of taking this course?'
-									name='purpose'
-									type='select'
-									value={formValues.purpose}
-									onChange={handleChange}
-									error={formError.purpose}
-									options={[
-										'To transition into Tech',
-										'To land a new job',
-										'To upskill what I already know',
-										'Career switch',
-									]}
-								/>
+								<div className='mb-4'>
+									<label className='block text-sm font-medium text-gray-700 mb-1'>
+										What is your purpose of taking this course?{' '}
+										<span className='text-red-500'>*</span>
+									</label>
+									<select
+										name='purpose'
+										value={formValues.purpose}
+										onChange={handleChange}
+										className={`w-full px-4 py-2 rounded-lg border ${
+											formError.purpose ? 'border-red-500' : 'border-gray-300'
+										} focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all`}
+									>
+										<option value=''>Select an option</option>
+										<option value='To transition into Tech'>
+											To transition into Tech
+										</option>
+										<option value='To land a new job'>To land a new job</option>
+										<option value='To upskill what I already know'>
+											To upskill what I already know
+										</option>
+										<option value='Career switch'>Career switch</option>
+									</select>
+									{formError.purpose && (
+										<p className='mt-1 text-sm text-red-500'>
+											{formError.purpose}
+										</p>
+									)}
+								</div>
 
-								<FormField
-									label='What do you do currently?'
-									name='currentProfession'
-									placeholder='Enter your current profession'
-									value={formValues.currentProfession}
-									onChange={handleChange}
-									error={formError.currentProfession}
-								/>
+								<div className='mb-4'>
+									<label className='block text-sm font-medium text-gray-700 mb-1'>
+										What do you do currently?{' '}
+										<span className='text-red-500'>*</span>
+									</label>
+									<input
+										type='text'
+										name='currentProfession'
+										placeholder='Enter your current profession'
+										value={formValues.currentProfession}
+										onChange={handleChange}
+										className={`w-full px-4 py-2 rounded-lg border ${
+											formError.currentProfession
+												? 'border-red-500'
+												: 'border-gray-300'
+										} focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all`}
+									/>
+									{formError.currentProfession && (
+										<p className='mt-1 text-sm text-red-500'>
+											{formError.currentProfession}
+										</p>
+									)}
+								</div>
 
-								<FormField
-									label='Why should we accept your application?'
-									name='applicationReason'
-									type='textarea'
-									placeholder="Tell us why you're a good fit for this program..."
-									value={formValues.applicationReason}
-									onChange={handleChange}
-									error={formError.applicationReason}
-								/>
+								<div className='mb-4'>
+									<label className='block text-sm font-medium text-gray-700 mb-1'>
+										Why should we accept your application?{' '}
+										<span className='text-red-500'>*</span>
+									</label>
+									<textarea
+										name='applicationReason'
+										placeholder="Tell us why you're a good fit for this program..."
+										value={formValues.applicationReason}
+										onChange={handleChange}
+										className={`w-full px-4 py-2 rounded-lg border ${
+											formError.applicationReason
+												? 'border-red-500'
+												: 'border-gray-300'
+										} focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all min-h-[100px]`}
+									/>
+									{formError.applicationReason && (
+										<p className='mt-1 text-sm text-red-500'>
+											{formError.applicationReason}
+										</p>
+									)}
+								</div>
 							</motion.div>
 						)}
 

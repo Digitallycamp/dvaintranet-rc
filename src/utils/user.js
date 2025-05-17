@@ -64,7 +64,9 @@ export async function onboardUser(userId, formValues) {
 		// userId: userId,
 		fullname: formValues.fullname,
 		// email: currentUserEmail,
-		whatsapp_no: formValues.whatsapp_no,
+		whatsapp_no: `${
+			formValues.whatsapp_no.countryCode + formValues.whatsapp_no.number
+		}`,
 		dob: { day: formValues.dob.day, month: formValues.dob.month },
 		age: formValues.age,
 		// batches: {},
