@@ -1,0 +1,105 @@
+/* Ensure the font is loaded */
+@import url('https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&display=swap');
+
+/* Light Mode */
+:root {
+	--bg-color: #ffffff;
+	--text-color: #080808;
+}
+
+/* Dark Mode */
+[data-theme='dark'] {
+	--bg-color: #1e1e1e;
+	--text-color: #ffffff;
+}
+
+body {
+	/* background-color: #eee6e3; */
+	background-color: var(--bg-color);
+	color: var(--text-color);
+}
+
+/* body {
+	background-color: #eee6e3;background-color: #eee6e3;
+} */
+
+/* For WebKit Browsers (e.g., Chrome, Safari) */
+.custom-scrollbar::-webkit-scrollbar {
+	width: 8px;
+}
+
+.custom-scrollbar::-webkit-scrollbar-track {
+	background: #f5f5f5;
+}
+
+.custom-scrollbar::-webkit-scrollbar-thumb {
+	background-color: #888;
+	border-radius: 10px;
+	border: 2px solid #f5f5f5;
+}
+
+.custom-scrollbar::-webkit-scrollbar-thumb:hover {
+	background-color: #555;
+}
+
+/* For Firefox */
+.custom-scrollbar {
+	scrollbar-width: thin;
+	scrollbar-color: #888 #f5f5f5; /* thumb color track color */
+}
+
+.progress {
+	background-image: url('./assets/partern.jpg');
+	background-repeat: no-repeat;
+	background-size: cover;
+	opacity: 0.1;
+}
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+	html {
+		font-family: 'Proxima Nova', system-ui, sans-serif;
+	}
+}
+
+.modal-content {
+	overflow: auto; /* Allows scrolling */
+	-ms-overflow-style: none;
+	scrollbar-width: none;
+}
+
+.modal-content::-webkit-scrollbar {
+	display: none;
+}
+
+/* Add this to your global CSS file or a specific CSS module */
+
+.cert-container {
+	background-image: url('./assets/Cert-background.png');
+	width: 100%;
+	background-size: contain;
+	background-repeat: no-repeat;
+	/* width: 29.7cm;
+	height: 21cm; */
+	/* aspect-ratio: 1.1.41; */
+}
+
+.images {
+	background-image: url('./assets/frame.png');
+	background-repeat: no-repeat;
+	background-size: contain;
+	color: #f9f9f9d8;
+}
+
+.cert {
+	font-family: 'Inter', sans-serif;
+}
+
+.cerbg {
+	background-image: url('./assets/Cert-background.png');
+	background-size: contain;
+	background-position: center;
+	background-repeat: no-repeat;
+}

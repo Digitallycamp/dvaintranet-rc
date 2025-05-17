@@ -1,0 +1,181 @@
+import React, { useEffect, useRef } from 'react';
+// import html2pdf from 'html2pdf.js';
+
+import certbg from '../assets/Cert-background.png';
+import badgepng from '../assets/badge.png';
+
+const Certificate = () => {
+	const certificateRef = useRef(null);
+	// const { currentUser } = useCurrentUser();
+
+	useEffect(() => {
+		if (certificateRef.current) {
+			certificateRef.current.style.backgroundImage = `url(${certbg})`;
+			certificateRef.current.style.backgroundSize = 'contain';
+			certificateRef.current.style.backgroundRepeat = 'no-repeat';
+		}
+	}, []);
+
+	//   const handleDownload = () => {
+	//     const element = certificateRef.current;
+	//     if (element) {
+	//       const opt = {
+	//         margin: 0,
+	//         filename: `Certificate.pdf`,
+	//         image: { type: "jpeg", quality: 0.98 },
+	//         html2canvas: { scale: 2 },
+	//         jsPDF: { unit: "in", format: "a4", orientation: "landscape" },
+	//       };
+	//       html2pdf().from(element).set(opt).save();
+	//     }
+	//   };
+
+	/*****DONT SHOW CERTIFICATE, lOOP THROUGH USER APPROAVED COURSES RETRIVE THE NAME AND USER FULLNAME AND PASS TO CERTIFCATE AS PROP  */
+	return (
+		<div>
+			<header className='mb-8'>
+				<button
+					className='px-3 h-8 bg-slate-950 text-white font-bold rounded-md'
+					// handleClick={handleDownload}
+				>
+					Download Certificate
+				</button>
+			</header>
+
+			<div className='flex flex-col items-center justify-center min-h-screen overflow-x-hidden'>
+				<div
+					ref={certificateRef}
+					className='p-10 w-[11.69in] h-[8.27in] flex flex-col items-center justify-center relative'
+					style={{ backgroundColor: 'white', opacity: 0.9 }}
+				>
+					<div className='absolute inset-10 text-gray-800'>
+						<div className='text-center mb-8'>
+							<h1 className='text-8xl font-serif   mt-2 uppercase'>
+								Certificate
+							</h1>
+							<p className='text-4xl font-light tracking-wide mt-8'>
+								OF COMPLETION
+							</p>
+						</div>
+						<div className='text-center mt-6 mb-8'>
+							<p className='text-2xl font-light'>
+								{' '}
+								THIS CERTIFICATE IS AWARDED TO
+							</p>
+							<h2 className='text-4xl font-serif italic mt-4'>
+								Wisdom Chimezie
+							</h2>
+						</div>
+						<div className='text-center mb-8'>
+							<p className='text-lg font-light mt-2'>
+								For Successfully Completing Digitally Virtual Academy Bootcamp.
+								This certificate<br></br> denotes proficiency in Product Design
+							</p>
+						</div>
+						<div className='flex justify-center items-center space-x-24 mt-28'>
+							{/* signatories */}
+							<div className='text-center'>
+								<p className='text-lg font-light '>30 September 2024</p>
+								<hr className='border border-zinc-500'></hr>
+								<div className='px-10'>
+									<p className='text-sm font-light'>Date</p>
+								</div>
+							</div>
+							{/* <div className='relative border-4 border-gray-300 h-[200px] w-[200px] rounded-full p-4 bg-white shadow-lg overflow-hidden'>
+								<svg
+									viewBox='0 0 240 240'
+									className='absolute top-0 left-0 w-full h-full'
+								>
+									<path
+										id='curve'
+										fill='transparent'
+										d='M 20, 120 a 100, 100 0 1, 1 200,0 a 100, 100 0 1, 1 -200,0'
+									/>
+									<text
+										width='240'
+										className='text-2xl font-light text-gray-700'
+									>
+										<textPath
+											href='#curve'
+											startOffset='50%'
+											textAnchor='middle'
+										>
+											Digitally Virtual Academy
+										</textPath>
+									</text>
+								</svg>
+								<div className='flex items-center justify-center h-full'>
+									<strong className='text-black text-3xl font-bold'>DVA</strong>
+								</div>
+							</div> */}
+							<div className='h-[200px] w-[200px] rounded-full  bg-white shadow-lg overflow-hidden'>
+								<img className='h-full w-full ' src={badgepng} alt='CERT' />
+							</div>
+							{/* signatories */}
+							<div className='text-center'>
+								<p>Wisdom</p>
+								<hr className='border border-zinc-500'></hr>
+								<div className='px-10'>
+									<p className='text-lg font-light'>Wisdom Christoper</p>
+									<p className='text-sm font-light'>Lead Instructor</p>
+								</div>
+							</div>
+						</div>
+						{/* <p>ID NO: {currentUser?.user._id}</p> */}
+					</div>
+				</div>
+			</div>
+			<main>
+				<div class='flex justify-center text-[146px] font-Martel Sans pt-14'>
+					<h1>CERTIFICATE</h1>
+				</div>
+				<div class='flex justify-center text-6xl font-medium font-Montserrat text-amber-800'>
+					<p>OF COMPLETION</p>
+				</div>
+				<div class='flex justify-center text-amber-800 text-base text-3xl font-medium font-Montserrat pt-6 pb-4'>
+					<strong>THIS CERTIFICATE IS AWARDED TO</strong>
+				</div>
+				<div class='flex justify-center text-4xl font-Alex Brush'>
+					<p>Mercy Igwala</p>
+				</div>
+				<div>
+					<hr class=' m-auto w-[500px] border-solid border-1 border-[#020617]' />
+				</div>
+				<div class='flex justify-center pt-4'>
+					<p>
+						For Successfully Completing Digitally Virtual Academy Bootcamp.This
+						Certificate
+					</p>
+				</div>
+				<div class='flex justify-center pb-6'>
+					<p>
+						denotes proficiency <span class='font-bold'>in Product Design</span>
+					</p>
+				</div>
+				<div class='flex justify-between items-center px-[180px]'>
+					<div class='images w-[290px]'>
+						<div class=' pb-16 mt-14  text-center  text-amber-800 text-2xl font-Montserrat'>
+							<p class=''>Date</p>
+						</div>
+					</div>
+					<div>
+						<img
+							class=' [340px] h-[345px] '
+							src={badgepng}
+							alt=''
+						/>
+					</div>
+
+					<div class='images w-[290px]'>
+						<div class=' pb-16 mt-14  text-center text-amber-800 text-2xl font-Montserrat'>
+							<p>Wisdom christoper</p>
+							<p>Lead Instructor</p>
+						</div>
+					</div>
+				</div>
+			</main>
+		</div>
+	);
+};
+
+export default Certificate;
