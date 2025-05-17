@@ -4,14 +4,7 @@
  *
  */
 
-import {
-	arrayUnion,
-	collection,
-	doc,
-	getDoc,
-	getDocs,
-	updateDoc,
-} from 'firebase/firestore';
+import { arrayUnion, doc, getDoc, updateDoc } from 'firebase/firestore';
 import { db } from '../firebase/firebase';
 import toast from 'react-hot-toast';
 
