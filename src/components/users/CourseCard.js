@@ -15,9 +15,9 @@ function CourseCard(props) {
 	} = props;
 
 	const slug = createSlug(title);
-	const { courseList } = props;
+
 	console.log('ALPHA PROS', props);
-	console.log('ALPHA PROS lst', courseList);
+
 	return (
 		<div className=' border border-zinc-100 rounded-lg  hover:bg-zinc-50 shadow-zinc-100 p-6 flex flex-col space-y-6 h-full '>
 			<div className='flex-grow'>
@@ -29,36 +29,47 @@ function CourseCard(props) {
 					<Clock size={18} />
 					<span className='text-xs'>Duration :{duration}</span>
 				</div>
-				<span>{skillLevel}</span>
+				<div className='flex items-center'>
+					<span className=' px-2 py-[.5px] rounded-full border border-blue-200'>
+						{skillLevel}
+					</span>
+				</div>
 			</div>
-			<div className=' flex justify-between'>
-				{user.role === 'user' && (
-					<Link
-						to={`/me/courses/${slug}?msockid=${id}`}
-						className='bg-zinc-900 text-zinc-300 font-semibold px-3 py-2 rounded-md mt-auto cursor-pointer'
-						state={props}
-					>
-						Register
-					</Link>
-				)}
-
-				{user.role === 'admin' && (
-					<div className=' flex justify-between w-full'>
+			<div className=' flex justify-between items-center'>
+				<div className=' flex justify-between'>
+					{user.role === 'user' && (
 						<Link
-							to={`/me/courses/edit/${slug}?msockid=${id}`}
+							to={`/me/courses/${slug}?msockid=${id}`}
 							className='bg-zinc-900 text-zinc-300 font-semibold px-3 py-2 rounded-md mt-auto cursor-pointer'
-							state={{ id, title, duration, careerPath, skillLevel }}
+							state={props}
 						>
-							Edit
+							Register
 						</Link>
-						<button
-							onClick={props.handleClick}
-							className='bg-zinc-900 text-zinc-300 font-semibold px-6 py-2 rounded-md mt-auto cursor-pointer'
-						>
-							Add Lesson
-						</button>
-					</div>
-				)}
+					)}
+
+					{user.role === 'admin' && (
+						<div className=' flex justify-between w-full space-x-6'>
+							<Link
+								to={`/me/courses/edit/${slug}?msockid=${id}`}
+								className='bg-zinc-900 text-zinc-300 font-semibold px-3 py-2 rounded-md mt-auto cursor-pointer'
+								state={{ id, title, duration, careerPath, skillLevel }}
+							>
+								Edit
+							</Link>
+							<button
+								onClick={props.handleClick}
+								className='bg-zinc-900 text-zinc-300 font-semibold px-6 py-2 rounded-md mt-auto cursor-pointer'
+							>
+								Add Lesson
+							</button>
+						</div>
+					)}
+				</div>
+				<div>
+					<span className=' bg-green-50 px-2 py-[0.5px] rounded-full'>
+						₦{props.price}K
+					</span>
+				</div>
 			</div>
 		</div>
 	);
