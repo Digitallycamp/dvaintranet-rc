@@ -29,7 +29,7 @@ function RegisteredCourseCard(props) {
 				</div>
 				<span>{skillLevel}</span>
 			</div>
-			<div>
+			<div className='flex items-center justify-between'>
 				<Link
 					to={`/me/my-courses/lessons/${slug}?msockid=${id}`}
 					className='bg-zinc-900 text-zinc-300 font-semibold px-3 py-2 rounded-md mt-auto cursor-pointer'
@@ -37,6 +37,12 @@ function RegisteredCourseCard(props) {
 				>
 					Go to lessions
 				</Link>
+				<a
+					href={`${props.class_link}`}
+					className='text-blue-200 underline-none'
+				>
+					Join class
+				</a>
 			</div>
 		</div>
 	);

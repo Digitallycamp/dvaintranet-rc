@@ -8,7 +8,7 @@ const VideoLaunchpad = ({ content }) => {
 			{/* Main Heading */}
 			<div className='max-w-7xl mx-auto text-center mb-12'>
 				<h2 className='text-3xl font-bold text-gray-900 sm:text-4xl'>
-					Learning Resources Launchpad
+					Free Overview Class
 				</h2>
 				{/* <p className='mt-4 text-xl text-gray-600 max-w-3xl mx-auto'>
 					Access all your course videos and materials in one place. Browse the
