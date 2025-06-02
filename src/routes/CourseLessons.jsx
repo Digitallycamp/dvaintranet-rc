@@ -1,4 +1,5 @@
 import { Play } from 'lucide-react';
+import ReactPlayer from 'react-player/youtube';
 import { Timestamp } from 'firebase/firestore';
 import React, { useState } from 'react';
 import { useLocation } from 'react-router-dom';
@@ -119,7 +120,14 @@ function CourseLessons() {
 				<section className=' w-full lg:w-[75%] bg-zinc-50 p-6 rounded-lg  order-1 lg:order-2'>
 					<div className='space-y-4'>
 						<h3> {showLeson?.title}</h3>
-						<div className='bg-zinc-800 p-4 rounded-lg w-full max-w-[560px] h-[315px]'>
+						<div
+							style={{
+								backgroundImage: "url('/videobg.png')",
+								backgroundPosition: 'center',
+								backgroundSize: 'contain',
+							}}
+							className=' bg-zinc-800 p-4 rounded-lg w-full max-w-[640px] h-[360px]'
+						>
 							{showLeson &&
 								showLeson?.videoURL.map((vid, index) => {
 									const checkVid = !vid
@@ -127,17 +135,35 @@ function CourseLessons() {
 										: vid;
 
 									return (
-										<iframe
-											key={index}
-											title={showLeson?.title}
-											className='w-full h-full'
-											src={`${checkVid}`}
-											// width='560'
-											// height='315'
+										// <iframe
+										// 	key={index}
+										// 	title={showLeson?.title}
+										// 	className='w-full h-full'
+										// 	src={`${checkVid}`}
+										// 	// width='560'
+										// 	// height='315'
 
-											allow='autoplay; encrypted-media'
-											allowFullScreen
-										></iframe>
+										// 	allow='autoplay; encrypted-media'
+										// 	allowFullScreen
+										// ></iframe>
+
+										// <iframe
+										// 	width='560'
+										// 	height='315'
+										// 	src='https://www.youtube.com/watch?v=ezjZEEl43Rs'
+										// 	title='YouTube video player'
+										// 	frameborder='0'
+										// 	allow='accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; '
+										// 	referrerpolicy='strict-origin-when-cross-origin'
+										// 	allowfullscreen
+										// ></iframe>
+										<ReactPlayer
+											url={`${checkVid}`}
+											controls
+											width='100%'
+											height='100%'
+											style={{ borderRadius: '8px' }}
+										/>
 									);
 								})}
 							{/* <iframe
@@ -156,8 +182,8 @@ function CourseLessons() {
 							></iframe> */}
 						</div>
 						{showLeson && (
-							<div>
-								<h3 className='2xl font-semibold'>Assessment</h3>
+							<div className='pt-8'>
+								<h3 className='2xl font-semibold mt-6'>Assessment</h3>
 								<div className='space-y-4'>
 									<p>{showLeson?.assessment?.question1}</p>
 									<h3 className='2xl font-semibold'>Resources</h3>
@@ -173,7 +199,10 @@ function CourseLessons() {
 											);
 										})}
 									</ul>
-									<form className=' my-10' onSubmit={handleSubmitAccessment}>
+									<form
+										className='w-full my-10'
+										onSubmit={handleSubmitAccessment}
+									>
 										<label className='text-xs'>Submit Assessment</label>
 										<br />
 										<input
@@ -183,7 +212,7 @@ function CourseLessons() {
 											required
 											type='url'
 											placeholder='Paste your link here'
-											className='font-semibold px-3 py-2 w-1/2 mt-auto rounded-tl-md rounded-bl-md outline-0 border outline-none'
+											className='font-semibold px-3 py-2 w-1/2 mt-auto rounded-tl-md rounded-bl-md outline-0 border outline-none w-[85%]'
 										/>
 										<button
 											type='submit'

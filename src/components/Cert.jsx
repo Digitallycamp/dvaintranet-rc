@@ -1,8 +1,16 @@
 import React from 'react';
 import badge from '../assets/badge.png';
 import cttsignature from '../assets/cttsignature.png';
+import { useAuth } from '../context/AuthContext';
 
 function Cert() {
+	const { user } = useAuth();
+	console.log(user);
+	const nameSplit = user?.fullname.split(' ');
+	const nameOnCert = `${nameSplit[0]} ${nameSplit[1].charAt(0)}. ${
+		nameSplit[2]
+	}`;
+
 	return (
 		<main className='cert'>
 			<div className='cerbg h-[8.3in] w-[11in] bg-[#fdfdfd] p-[0.5in]  '>
@@ -15,7 +23,7 @@ function Cert() {
 							Certificate of Completion
 						</p>
 						<h2 className='text-5xl text-center font-extrabold mt-3'>
-							Wisdom C. Onyearizo
+							{nameOnCert}
 						</h2>
 						<p className='text-center text-2xl mt-4'>
 							Has graduated the Digital Academy
