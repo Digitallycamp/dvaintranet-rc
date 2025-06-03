@@ -2,7 +2,7 @@ import { Play } from 'lucide-react';
 import ReactPlayer from 'react-player/youtube';
 import { Timestamp } from 'firebase/firestore';
 import React, { useState } from 'react';
-import { useLocation } from 'react-router-dom';
+import { useLocation, useSearchParams } from 'react-router-dom';
 import {
 	studentMarkLessonAsCompleted,
 	studentSubmitAssessment,
@@ -11,6 +11,9 @@ import { useAuth } from '../context/AuthContext';
 import { Oval } from 'react-loader-spinner';
 
 function CourseLessons() {
+	const [searchParams] = useSearchParams();
+	const mockId = searchParams.get('msockid'); // Retrieve the mockId from URL
+
 	const location = useLocation();
 
 	const [showLeson, setShowLesson] = useState(false);
@@ -20,6 +23,9 @@ function CourseLessons() {
 	const { user } = useAuth();
 	console.log('showlesson', showLeson);
 	const { state } = location;
+	const courseLesson = state?.lessons.filter(
+		(myless) => myless.courseID === mockId
+	);
 
 	const handleMarkLessonAsCompleted = async (id) => {
 		/* Calculate the toggled state
@@ -35,7 +41,7 @@ function CourseLessons() {
 	};
 
 	const handleLesson = (lessonId) => {
-		const activeLesson = state.lessons.find((less) => less.id === lessonId);
+		const activeLesson = courseLesson.find((less) => less.id === lessonId);
 
 		setShowLesson(activeLesson);
 	};
@@ -69,7 +75,7 @@ function CourseLessons() {
 		}
 	};
 
-	if (state.lessons.length === 0) {
+	if (courseLesson.length === 0) {
 		return <p className='text-center'>No lesson posted by Intructor!</p>;
 	}
 
@@ -85,7 +91,7 @@ function CourseLessons() {
 			</header>
 			<main className=' flex flex-col lg:flex lg:flex-row gap-6 mt-10 '>
 				<aside className='  lg:w-1/4 bg-zinc-50 p-6 rounded-lg space-y-2 order-2 lg:order-1 overflow-y-auto'>
-					{<h3>Batch: {state.lessons[0]?.batchID}</h3>}
+					{<h3>Batch: {courseLesson[0]?.batchID}</h3>}
 					<hr className='border-b border-b-zinc-800' />
 					<div>
 						{/* // dynamic */}
@@ -96,8 +102,7 @@ function CourseLessons() {
 							</div>
 							<hr className='border-b border-b-zinc-200' />
 							<ul className='space-y-3 mt-2'>
-								{state.lessons.map((lesson) => {
-									console.log(lesson);
+								{courseLesson.map((lesson) => {
 									return (
 										<li
 											onClick={() => handleLesson(lesson.id)}
@@ -108,7 +113,9 @@ function CourseLessons() {
 											}`}
 										>
 											{lesson.title}
-											<Play size={12} />
+											<div className='p-2 rounded-full bg-slate-400'>
+												<Play size={12} color='#fff' />
+											</div>
 										</li>
 									);
 								})}
@@ -124,39 +131,18 @@ function CourseLessons() {
 							style={{
 								backgroundImage: "url('/videobg.png')",
 								backgroundPosition: 'center',
-								backgroundSize: 'contain',
+								backgroundSize: 'cover',
+								backgroundRepeat: 'no-repeat',
 							}}
 							className=' bg-zinc-800 p-4 rounded-lg w-full max-w-[640px] h-[360px]'
 						>
 							{showLeson &&
 								showLeson?.videoURL.map((vid, index) => {
 									const checkVid = !vid
-										? `${state.lessons[0]?.videoURL[0]}`
+										? `${courseLesson[0]?.videoURL[0]}`
 										: vid;
 
 									return (
-										// <iframe
-										// 	key={index}
-										// 	title={showLeson?.title}
-										// 	className='w-full h-full'
-										// 	src={`${checkVid}`}
-										// 	// width='560'
-										// 	// height='315'
-
-										// 	allow='autoplay; encrypted-media'
-										// 	allowFullScreen
-										// ></iframe>
-
-										// <iframe
-										// 	width='560'
-										// 	height='315'
-										// 	src='https://www.youtube.com/watch?v=ezjZEEl43Rs'
-										// 	title='YouTube video player'
-										// 	frameborder='0'
-										// 	allow='accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; '
-										// 	referrerpolicy='strict-origin-when-cross-origin'
-										// 	allowfullscreen
-										// ></iframe>
 										<ReactPlayer
 											url={`${checkVid}`}
 											controls
@@ -166,64 +152,36 @@ function CourseLessons() {
 										/>
 									);
 								})}
-							{/* <iframe
-								className='w-full h-full'
-								src={`${lessons.videoUrl}`}
-								// width='560'
-								// height='315'
-								allow='autoplay'
-							></iframe> */}
-							{/* <iframe
-								className='w-full h-full'
-								src='https://drive.google.com/file/d/18B_nHQP0kDSBIt2SXqhWY6hmrbmq7f72/preview'
-								// width='560'
-								// height='315'
-								allow='autoplay'
-							></iframe> */}
 						</div>
 						{showLeson && (
 							<div className='pt-8'>
-								<h3 className='2xl font-semibold mt-6'>Assessment</h3>
-								<div className='space-y-4'>
-									<p>{showLeson?.assessment?.question1}</p>
-									<h3 className='2xl font-semibold'>Resources</h3>
-									<ul>
-										{showLeson?.resources.map((resource, index) => {
-											return (
-												<li key={index} className='space-x-2'>
-													<span>{index + 1}.</span>
-													<a href={`${resource}`} className='text-blue-500'>
-														{resource}
-													</a>
-												</li>
-											);
-										})}
-									</ul>
-									<form
-										className='w-full my-10'
-										onSubmit={handleSubmitAccessment}
-									>
+								<h3 className='text-lg font-semibold '>Assessment</h3>
+								<p>{showLeson?.assessment?.question1}</p>
+								<div className='space-y-1'>
+									<form className='w-full ' onSubmit={handleSubmitAccessment}>
 										<label className='text-xs'>Submit Assessment</label>
 										<br />
-										<input
-											name='assessment'
-											value={assessment}
-											onChange={(e) => setAssessment(e.target.value)}
-											required
-											type='url'
-											placeholder='Paste your link here'
-											className='font-semibold px-3 py-2 w-1/2 mt-auto rounded-tl-md rounded-bl-md outline-0 border outline-none w-[85%]'
-										/>
-										<button
-											type='submit'
-											className=' bg-zinc-900 text-zinc-300 font-semibold px-3 py-2 rounded-tr-md rounded-br-md mt-auto cursor-pointer'
-										>
-											{isSubmitting ? (
-												<Oval width={24} height={24} />
-											) : (
-												'Submit'
-											)}
-										</button>
+										<div className='flex'>
+											<input
+												name='assessment'
+												value={assessment}
+												onChange={(e) => setAssessment(e.target.value)}
+												required
+												type='url'
+												placeholder='Paste your link here'
+												className='font-semibold px-3 py-2 w-full mt-auto rounded-tl-md rounded-bl-md outline-0 border outline-none'
+											/>
+											<button
+												type='submit'
+												className=' block bg-zinc-900 text-zinc-300 font-semibold px-3 py-2 rounded-tr-md rounded-br-md mt-auto cursor-pointer'
+											>
+												{isSubmitting ? (
+													<Oval width={24} height={24} />
+												) : (
+													'Submit'
+												)}
+											</button>
+										</div>
 									</form>
 									{user.role === 'admin' && (
 										<button
@@ -238,6 +196,20 @@ function CourseLessons() {
 										</button>
 									)}
 								</div>
+
+								<h3 className='text-lg mt-10 font-semibold'>Resources</h3>
+								<ul>
+									{showLeson?.resources.map((resource, index) => {
+										return (
+											<li key={index} className='space-x-2'>
+												<span>{index + 1}.</span>
+												<a href={`${resource}`} className='text-blue-500'>
+													{resource}
+												</a>
+											</li>
+										);
+									})}
+								</ul>
 							</div>
 						)}
 					</div>

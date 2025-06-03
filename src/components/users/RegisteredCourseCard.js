@@ -4,7 +4,6 @@ import { Link } from 'react-router-dom';
 import { createSlug } from '../../utils/createSlug';
 
 function RegisteredCourseCard(props) {
-	console.log('PROOOOOPS:', props);
 	const {
 		id,
 		title,
@@ -14,7 +13,6 @@ function RegisteredCourseCard(props) {
 	} = props;
 
 	const slug = createSlug(title);
-	console.log();
 
 	return (
 		<div className=' border border-zinc-100 rounded-lg  hover:bg-zinc-50 shadow-zinc-100 p-6 flex flex-col space-y-6 h-full '>

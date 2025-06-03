@@ -86,7 +86,6 @@ function MyCourses() {
 		return <p className='text-red-500'>{error}</p>;
 	}
 
-	console.log('MY REG BATCHES', selectedBatch);
 	return (
 		<div className='space-y-6'>
 			<h1>My Courses</h1>
@@ -105,13 +104,16 @@ function MyCourses() {
 			</select>
 			<div className='grid sm:grid-cols-2 md:grid-cols-3 gap-5'>
 				{approvedCourses?.length > 0 ? (
-					approvedCourses?.map((course) => (
-						<RegisteredCourseCard
-							key={course.id}
-							{...course}
-							lessons={lessons}
-						/>
-					))
+					approvedCourses?.map((course) => {
+						console.log('FUCK ME!!!!', course);
+						return (
+							<RegisteredCourseCard
+								key={course.id}
+								{...course}
+								lessons={lessons}
+							/>
+						);
+					})
 				) : (
 					<p>No approved courses for this batch.</p>
 				)}

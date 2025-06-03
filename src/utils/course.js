@@ -82,6 +82,7 @@ export async function getLessonsByCourseAndBatchIds(courseIds, batchId) {
 				lessons.push({ id: doc.id, ...doc.data() });
 			});
 		}
+
 		return lessons;
 	} catch (error) {
 		console.log(error);

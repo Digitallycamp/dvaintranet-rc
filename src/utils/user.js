@@ -417,7 +417,7 @@ export async function showOnlyUserApprovedCourse(
 		courseIds,
 		selectedBatch
 	);
-	console.log('MY LESSONS', lessonsForApprovedCourses);
+	console.log('MY LESSONS 00000', lessonsForApprovedCourses);
 	// Set the lessons
 	setLessons(lessonsForApprovedCourses);
 
