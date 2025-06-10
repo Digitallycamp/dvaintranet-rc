@@ -27,6 +27,12 @@ function CourseLessons() {
 		(myless) => myless.courseID === mockId
 	);
 
+	const sortedCourse = courseLesson.sort((a, b) => {
+		const timeA = a.createdAt.seconds * 1e9 + a.createdAt.nanoseconds;
+		const timeB = b.createdAt.seconds * 1e9 + b.createdAt.nanoseconds;
+		return timeA - timeB;
+	});
+
 	const handleMarkLessonAsCompleted = async (id) => {
 		/* Calculate the toggled state
         React updates the state asynchronously, so the value of completedLesson being passed to studentMarkLessonAsCompleted is not the latest toggled value when you do setCompletedLesson(!completedLesson). rather do this way to get latest toggled value */
@@ -41,7 +47,7 @@ function CourseLessons() {
 	};
 
 	const handleLesson = (lessonId) => {
-		const activeLesson = courseLesson.find((less) => less.id === lessonId);
+		const activeLesson = sortedCourse.find((less) => less.id === lessonId);
 
 		setShowLesson(activeLesson);
 	};
@@ -156,7 +162,7 @@ function CourseLessons() {
 						{showLeson && (
 							<div className='pt-8'>
 								<h3 className='text-lg font-semibold '>Assessment</h3>
-								<p>{showLeson?.assessment?.question1}</p>
+								<p>{showLeson?.assessment?.assessment}</p>
 								<div className='space-y-1'>
 									<form className='w-full ' onSubmit={handleSubmitAccessment}>
 										<label className='text-xs'>Submit Assessment</label>
